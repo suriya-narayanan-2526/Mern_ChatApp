@@ -1,0 +1,132 @@
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease-in;
+  backdrop-filter: blur(4px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.dialog-box {
+  background: linear-gradient(135deg, rgba(26, 26, 46, 0.98) 0%, rgba(20, 20, 30, 0.98) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 20px;
+  padding: 36px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.6);
+  animation: slideUp 0.3s ease-out;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.dialog-icon {
+  font-size: 56px;
+  text-align: center;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 4px 12px rgba(239, 68, 68, 0.3));
+}
+
+.dialog-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin: 0 0 12px 0;
+}
+
+.dialog-message {
+  font-size: 15px;
+  color: #9ca3af;
+  text-align: center;
+  line-height: 1.6;
+  margin: 0 0 28px 0;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.dialog-btn {
+  flex: 1;
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.cancel-btn {
+  background-color: rgba(107, 114, 128, 0.2);
+  color: #9ca3af;
+  border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+.cancel-btn:hover {
+  background-color: rgba(107, 114, 128, 0.3);
+  border-color: rgba(107, 114, 128, 0.5);
+  transform: translateY(-2px);
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.delete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+}
+
+.dialog-btn:active {
+  transform: translateY(0);
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .dialog-box {
+    padding: 28px 20px;
+  }
+
+  .dialog-title {
+    font-size: 20px;
+  }
+
+  .dialog-actions {
+    flex-direction: column;
+  }
+
+  .dialog-btn {
+    width: 100%;
+  }
+}

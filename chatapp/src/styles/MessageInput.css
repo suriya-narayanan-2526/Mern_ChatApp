@@ -1,0 +1,224 @@
+.message-input-wrapper {
+  position: relative;
+  background-color: #1a1a2e;
+  border-top: 1px solid rgba(139, 92, 246, 0.15);
+}
+
+.emoji-picker {
+  position: absolute;
+  bottom: 80px;
+  left: 24px;
+  background: rgba(20, 20, 30, 0.98);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  width: 360px;
+  max-height: 420px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+.emoji-picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.15);
+  font-size: 14px;
+  font-weight: 700;
+  color: #e5e7eb;
+}
+
+.emoji-close-btn {
+  background: rgba(139, 92, 246, 0.1);
+  border: none;
+  font-size: 18px;
+  color: #8B5CF6;
+  cursor: pointer;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.emoji-close-btn:hover {
+  background: rgba(139, 92, 246, 0.2);
+}
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  padding: 16px;
+  overflow-y: auto;
+  max-height: 360px;
+}
+
+.emoji-btn {
+  background: none;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emoji-btn:hover {
+  background: rgba(139, 92, 246, 0.15);
+  transform: scale(1.2);
+}
+
+.emoji-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.emoji-grid::-webkit-scrollbar-track {
+  background: rgba(30, 30, 45, 0.3);
+}
+
+.emoji-grid::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 3px;
+}
+
+.emoji-grid::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.5);
+}
+
+.message-input-container {
+  display: flex;
+  gap: 12px;
+  padding: 20px 24px;
+  align-items: center;
+}
+
+.input-action-btn {
+  background: rgba(139, 92, 246, 0.1);
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  color: #8B5CF6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s;
+  font-size: 24px;
+}
+
+.input-action-btn:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.2);
+  transform: scale(1.05);
+}
+
+.input-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loading-spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(139, 92, 246, 0.3);
+  border-top-color: #8B5CF6;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.message-input {
+  flex: 1;
+  padding: 14px 20px;
+  font-size: 15px;
+  background-color: rgba(30, 30, 45, 0.8);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 24px;
+  outline: none;
+  color: #ffffff;
+  font-family: inherit;
+  transition: all 0.3s;
+}
+
+.message-input::placeholder {
+  color: #6b7280;
+}
+
+.message-input:focus {
+  border-color: #8B5CF6;
+  background-color: rgba(30, 30, 45, 1);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.message-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.send-button {
+  width: 44px;
+  height: 44px;
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #8B5CF6 0%, #6366f1 100%);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.send-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+}
+
+.send-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  background: rgba(107, 114, 128, 0.3);
+  box-shadow: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .message-input-container {
+    padding: 16px 20px;
+    gap: 10px;
+  }
+
+  .input-action-btn,
+  .send-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .emoji-picker {
+    width: 320px;
+    left: 20px;
+  }
+
+  .emoji-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
