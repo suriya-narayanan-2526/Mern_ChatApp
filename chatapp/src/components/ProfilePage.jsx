@@ -18,7 +18,7 @@ function ProfilePage({ currentUser, onLogout, onProfileUpdate, onClose }) {
     formData.append('profilePicture', file);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/profile/${currentUser._id}/upload`, {
+      const response = await fetch(`https://chatwithlocalfriends.onrender.com/api/auth/profile/${currentUser._id}/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -43,7 +43,7 @@ function ProfilePage({ currentUser, onLogout, onProfileUpdate, onClose }) {
     setSaving(true);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/profile/${currentUser._id}`, {
+      const response = await fetch(`https://chatwithlocalfriends.onrender.com/${currentUser._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ function ProfilePage({ currentUser, onLogout, onProfileUpdate, onClose }) {
 
   const getProfileImage = () => {
     if (currentUser.profilePicture) {
-      return `http://localhost:5000${currentUser.profilePicture}`;
+      return `https://chatwithlocalfriends.onrender.com${currentUser.profilePicture}`;
     }
     return null;
   };

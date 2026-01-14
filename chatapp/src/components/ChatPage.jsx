@@ -5,7 +5,7 @@ import ChatBox from './ChatBox';
 import ProfilePage from './ProfilePage';
 import '../styles/ChatPage.css';
 
-const socket = io('http://localhost:5000', {
+const socket = io('https://chatwithlocalfriends.onrender.com', {
   transports: ['websocket'],
   reconnection: true,
   reconnectionDelay: 1000,
@@ -25,7 +25,7 @@ function ChatPage({ currentUser, onLogout }) {
     // Fetch initial user list
     const fetchUsers = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/auth/users');
+        const response = await fetch('https://chatwithlocalfriends.onrender.com/api/auth/users');
         const data = await response.json();
         setUsers(data.filter(user => user._id !== currentUser._id));
       } catch (err) {

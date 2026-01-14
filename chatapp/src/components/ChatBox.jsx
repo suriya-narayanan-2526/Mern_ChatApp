@@ -81,7 +81,7 @@ function ChatBox({ selectedUser, messages, currentUser, onSendMessage, onDeleteM
 
   const getProfileImage = (user) => {
     if (user.profilePicture) {
-      return `http://localhost:5000${user.profilePicture}`;
+      return `https://chatwithlocalfriends.onrender.com${user.profilePicture}`;
     }
     return null;
   };
@@ -162,10 +162,10 @@ function ChatBox({ selectedUser, messages, currentUser, onSendMessage, onDeleteM
                       {message.messageType === 'image' && message.mediaUrl ? (
                         <div className="message-media">
                           <img 
-                            src={`http://localhost:5000${message.mediaUrl}`} 
+                            src={`https://chatwithlocalfriends.onrender.com${message.mediaUrl}`} 
                             alt="Sent media" 
                             className="message-image"
-                            onClick={() => handleImageClick(`http://localhost:5000${message.mediaUrl}`)}
+                            onClick={() => handleImageClick(`https://chatwithlocalfriends.onrender.com${message.mediaUrl}`)}
                           />
                         </div>
                       ) : null}

@@ -41,7 +41,7 @@ function AuthPage({ onAuthSuccess, isLogin, onToggleMode }) {
         ? { email, password }
         : { name, email, password };
 
-      const response = await fetch(`http://localhost:5000/api/auth/${endpoint}`, {
+      const response = await fetch(`https://chatwithlocalfriends.onrender.com/api/auth/${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

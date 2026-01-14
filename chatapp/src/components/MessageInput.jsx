@@ -52,7 +52,7 @@ function MessageInput({ onSendMessage }) {
     formData.append('media', file);
 
     try {
-      const response = await fetch('http://localhost:5000/api/media/upload', {
+      const response = await fetch('https://chatwithlocalfriends.onrender.com/api/media/upload', {
         method: 'POST',
         body: formData,
       });

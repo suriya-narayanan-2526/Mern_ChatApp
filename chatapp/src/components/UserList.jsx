@@ -18,7 +18,7 @@ function UserList({ users, selectedUser, onUserSelect, unreadMessages }) {
 
   const getProfileImage = (user) => {
     if (user.profilePicture) {
-      return `http://localhost:5000${user.profilePicture}`;
+      return `https://chatwithlocalfriends.onrender.com${user.profilePicture}`;
     }
     return null;
   };

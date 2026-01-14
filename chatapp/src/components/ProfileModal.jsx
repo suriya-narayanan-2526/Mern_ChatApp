@@ -41,7 +41,7 @@ function ProfileModal({ user, onClose, onUpdate }) {
         formData.append('profilePhoto', profilePhoto);
       }
 
-      const response = await fetch(`http://localhost:5000/api/profile/${user._id}`, {
+      const response = await fetch(`https://chatwithlocalfriends.onrender.com/api/profile/${user._id}`, {
         method: 'PUT',
         body: formData
       });
@@ -73,7 +73,7 @@ function ProfileModal({ user, onClose, onUpdate }) {
           <div className="profile-photo-section">
             <div className="photo-preview">
               {previewUrl ? (
-                <img src={previewUrl.startsWith('http') ? previewUrl : `http://localhost:5000${previewUrl}`} alt="Profile" />
+                <img src={previewUrl.startsWith('http') ? previewUrl : `https://chatwithlocalfriends.onrender.com${previewUrl}`} alt="Profile" />
               ) : (
                 <div className="default-avatar">
                   {name.charAt(0).toUpperCase()}
