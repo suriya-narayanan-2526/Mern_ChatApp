@@ -1,4 +1,6 @@
 import React, { useState, useRef } from 'react';
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebase";
 import '../styles/MessageInput.css';
 
 function MessageInput({ onSendMessage }) {
@@ -48,28 +50,28 @@ function MessageInput({ onSendMessage }) {
 
     setUploading(true);
 
-    const formData = new FormData();
-    formData.append('media', file);
-
     try {
-      const response = await fetch('https://chatwithlocalfriends.onrender.com/api/media/upload', {
-        method: 'POST',
-        body: formData,
-      });
+      // Create a unique filename
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const storageRef = ref(storage, `media/${file.name}-${uniqueSuffix}`);
 
-      const data = await response.json();
+      // Upload file
+      const uploadTask = await uploadBytesResumable(storageRef, file);
 
-      if (response.ok) {
-        onSendMessage('', 'image', data.mediaUrl);
-      } else {
-        alert(data.message || 'Failed to upload media');
-      }
+      // Get download URL
+      const downloadURL = await getDownloadURL(uploadTask.ref);
+
+      // Send message with image URL
+      onSendMessage('', 'image', downloadURL);
+
     } catch (err) {
       console.error('Upload error:', err);
       alert('Failed to upload media');
     } finally {
       setUploading(false);
-      e.target.value = '';
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -79,7 +81,7 @@ function MessageInput({ onSendMessage }) {
         <div className="emoji-picker">
           <div className="emoji-picker-header">
             <span>Pick an emoji</span>
-            <button 
+            <button
               className="emoji-close-btn"
               onClick={() => setShowEmojiPicker(false)}
             >
@@ -99,7 +101,7 @@ function MessageInput({ onSendMessage }) {
           </div>
         </div>
       )}
-      
+
       <form className="message-input-container" onSubmit={handleSubmit}>
         <button
           type="button"
@@ -112,9 +114,9 @@ function MessageInput({ onSendMessage }) {
             <span className="loading-spinner-small"></span>
           ) : (
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M17 8L12 3L7 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M12 3V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M17 8L12 3L7 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M12 3V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           )}
         </button>
@@ -125,7 +127,7 @@ function MessageInput({ onSendMessage }) {
           onChange={handleMediaUpload}
           style={{ display: 'none' }}
         />
-        
+
         <button
           type="button"
           className="input-action-btn"
@@ -134,7 +136,7 @@ function MessageInput({ onSendMessage }) {
         >
           😊
         </button>
-        
+
         <input
           ref={inputRef}
           type="text"
@@ -145,14 +147,14 @@ function MessageInput({ onSendMessage }) {
           onKeyPress={handleKeyPress}
           disabled={uploading}
         />
-        
-        <button 
-          type="submit" 
-          className="send-button" 
+
+        <button
+          type="submit"
+          className="send-button"
           disabled={!message.trim() || uploading}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z"/>
+            <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z" />
           </svg>
         </button>
       </form>

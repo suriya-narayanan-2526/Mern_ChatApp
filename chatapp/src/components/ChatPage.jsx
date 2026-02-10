@@ -19,13 +19,45 @@ function ChatPage({ currentUser, onLogout }) {
   const [showProfile, setShowProfile] = useState(false);
   const [currentUserProfile, setCurrentUserProfile] = useState(currentUser);
   const [searchQuery, setSearchQuery] = useState('');
-  const [unreadMessages, setUnreadMessages] = useState({}); // NEW: Track unread messages
+  const [unreadMessages, setUnreadMessages] = useState({});
+
+  /* ===================================================== */
+  /* ✅ SINGLE MOBILE BACK BUTTON HANDLER (FIXED) */
+  /* ===================================================== */
+  useEffect(() => {
+    const handleBackButton = () => {
+      // 1️⃣ Profile open → go back to Home
+      if (showProfile) {
+        setShowProfile(false);
+        window.history.pushState(null, '', window.location.href);
+        return;
+      }
+
+      // 2️⃣ Chat open → go back to UserList
+      if (selectedUser) {
+        setSelectedUser(null);
+        window.history.pushState(null, '', window.location.href);
+        return;
+      }
+
+      // 3️⃣ Otherwise → allow browser default
+    };
+
+    window.history.pushState(null, '', window.location.href);
+    window.addEventListener('popstate', handleBackButton);
+
+    return () => {
+      window.removeEventListener('popstate', handleBackButton);
+    };
+  }, [selectedUser, showProfile]);
+  /* ===================================================== */
 
   useEffect(() => {
-    // Fetch initial user list
     const fetchUsers = async () => {
       try {
-        const response = await fetch('https://chatwithlocalfriends.onrender.com/api/auth/users');
+        const response = await fetch(
+          'https://chatwithlocalfriends.onrender.com/api/auth/users'
+        );
         const data = await response.json();
         setUsers(data.filter(user => user._id !== currentUser._id));
       } catch (err) {
@@ -35,26 +67,19 @@ function ChatPage({ currentUser, onLogout }) {
 
     fetchUsers();
 
-    // BUG FIX: Wait for socket connection before emitting
     socket.on('connect', () => {
-      console.log('Socket connected:', socket.id);
       setTimeout(() => {
         socket.emit('user_login', currentUser._id);
-        console.log('Emitted user_login for:', currentUser._id);
       }, 100);
     });
 
-    // Listen for user list updates
     socket.on('user_list_updated', (userList) => {
-      console.log('Received user_list_updated:', userList.length, 'users');
       setUsers(userList.filter(user => user._id !== currentUser._id));
     });
 
-    // Listen for incoming messages
     socket.on('receive_message', (message) => {
-      setMessages(prevMessages => [...prevMessages, message]);
-      
-      // NEW: If message is from another user and not viewing their chat, increment unread count
+      setMessages(prev => [...prev, message]);
+
       if (message.senderId !== currentUser._id) {
         const otherUserId = message.senderId;
         if (!selectedUser || selectedUser._id !== otherUserId) {
@@ -66,17 +91,12 @@ function ChatPage({ currentUser, onLogout }) {
       }
     });
 
-    // Listen for loaded messages
-    socket.on('load_messages', (loadedMessages) => {
-      setMessages(loadedMessages);
-    });
+    socket.on('load_messages', setMessages);
 
-    // Listen for message deletion
     socket.on('message_deleted', (messageId) => {
-      setMessages(prevMessages => prevMessages.filter(msg => msg._id !== messageId));
+      setMessages(prev => prev.filter(msg => msg._id !== messageId));
     });
 
-    // Cleanup on unmount
     return () => {
       socket.off('connect');
       socket.off('user_list_updated');
@@ -90,15 +110,13 @@ function ChatPage({ currentUser, onLogout }) {
     setSelectedUser(user);
     setMessages([]);
     setShowProfile(false);
-    
-    // NEW: Clear unread count for this user
+
     setUnreadMessages(prev => {
-      const newUnread = { ...prev };
-      delete newUnread[user._id];
-      return newUnread;
+      const copy = { ...prev };
+      delete copy[user._id];
+      return copy;
     });
-    
-    // Join private room
+
     socket.emit('join_private_room', {
       currentUserId: currentUser._id,
       otherUserId: user._id
@@ -106,26 +124,26 @@ function ChatPage({ currentUser, onLogout }) {
   };
 
   const handleSendMessage = (message, messageType, mediaUrl) => {
-    if (selectedUser) {
-      socket.emit('send_message', {
-        senderId: currentUser._id,
-        senderName: currentUser.name,
-        receiverId: selectedUser._id,
-        message: message || '',
-        messageType: messageType || 'text',
-        mediaUrl: mediaUrl || null
-      });
-    }
+    if (!selectedUser) return;
+
+    socket.emit('send_message', {
+      senderId: currentUser._id,
+      senderName: currentUser.name,
+      receiverId: selectedUser._id,
+      message: message || '',
+      messageType: messageType || 'text',
+      mediaUrl: mediaUrl || null
+    });
   };
 
   const handleDeleteMessage = (messageId) => {
-    if (selectedUser) {
-      socket.emit('delete_message', {
-        messageId,
-        senderId: currentUser._id,
-        receiverId: selectedUser._id
-      });
-    }
+    if (!selectedUser) return;
+
+    socket.emit('delete_message', {
+      messageId,
+      senderId: currentUser._id,
+      receiverId: selectedUser._id
+    });
   };
 
   const handleLogout = () => {
@@ -143,7 +161,6 @@ function ChatPage({ currentUser, onLogout }) {
     localStorage.setItem('currentUser', JSON.stringify(updatedUser));
   };
 
-  // Filter users based on search query
   const filteredUsers = users.filter(user =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -154,24 +171,23 @@ function ChatPage({ currentUser, onLogout }) {
         <div className="sidebar-header">
           <div className="app-branding">
             <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
-              <path d="M24 4C13.5 4 5 12.5 5 23C5 28.5 7.5 33.5 11.5 37L8 44L15.5 41C18.5 42.5 21.5 43 24 43C34.5 43 43 34.5 43 23C43 12.5 34.5 4 24 4Z" fill="#8B5CF6"/>
+              <path
+                d="M24 4C13.5 4 5 12.5 5 23C5 28.5 7.5 33.5 11.5 37L8 44L15.5 41C18.5 42.5 21.5 43 24 43C34.5 43 43 34.5 43 23C43 12.5 34.5 4 24 4Z"
+                fill="#8B5CF6"
+              />
             </svg>
             <span className="app-name">QuickChat</span>
           </div>
           <button className="menu-btn" onClick={handleShowProfile}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-              <circle cx="10" cy="5" r="1.5"/>
-              <circle cx="10" cy="10" r="1.5"/>
-              <circle cx="10" cy="15" r="1.5"/>
+              <circle cx="10" cy="5" r="1.5" />
+              <circle cx="10" cy="10" r="1.5" />
+              <circle cx="10" cy="15" r="1.5" />
             </svg>
           </button>
         </div>
 
         <div className="search-container">
-          <svg className="search-icon" width="18" height="18" viewBox="0 0 20 20" fill="none">
-            <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="2"/>
-            <path d="M14 14L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
           <input
             type="text"
             placeholder="Search User..."
@@ -181,8 +197,8 @@ function ChatPage({ currentUser, onLogout }) {
           />
         </div>
 
-        <UserList 
-          users={filteredUsers} 
+        <UserList
+          users={filteredUsers}
           selectedUser={selectedUser}
           onUserSelect={handleUserSelect}
           unreadMessages={unreadMessages}
@@ -191,19 +207,20 @@ function ChatPage({ currentUser, onLogout }) {
 
       <div className="chat-main">
         {showProfile ? (
-          <ProfilePage 
+          <ProfilePage
             currentUser={currentUserProfile}
             onLogout={handleLogout}
             onProfileUpdate={handleProfileUpdate}
             onClose={() => setShowProfile(false)}
           />
         ) : selectedUser ? (
-          <ChatBox 
+          <ChatBox
             selectedUser={selectedUser}
             messages={messages}
             currentUser={currentUserProfile}
             onSendMessage={handleSendMessage}
             onDeleteMessage={handleDeleteMessage}
+            onBack={() => setSelectedUser(null)}
           />
         ) : (
           <div className="no-chat-selected">

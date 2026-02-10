@@ -3,7 +3,14 @@ import MessageInput from './MessageInput';
 import DeleteConfirmDialog from './DeleteConfirmDialog';
 import '../styles/ChatBox.css';
 
-function ChatBox({ selectedUser, messages, currentUser, onSendMessage, onDeleteMessage }) {
+function ChatBox({
+  selectedUser,
+  messages,
+  currentUser,
+  onSendMessage,
+  onDeleteMessage,
+  onBack
+}) {
   const messagesEndRef = useRef(null);
   const [hoveredMessageId, setHoveredMessageId] = useState(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -20,9 +27,9 @@ function ChatBox({ selectedUser, messages, currentUser, onSendMessage, onDeleteM
 
   const formatTime = (timestamp) => {
     const date = new Date(timestamp);
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
@@ -32,17 +39,14 @@ function ChatBox({ selectedUser, messages, currentUser, onSendMessage, onDeleteM
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
-    if (date.toDateString() === today.toDateString()) {
-      return 'Today';
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      return 'Yesterday';
-    } else {
-      return date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric', 
-        year: 'numeric' 
-      });
-    }
+    if (date.toDateString() === today.toDateString()) return 'Today';
+    if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
+
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
   };
 
   const handleDeleteClick = (messageId) => {
@@ -58,33 +62,24 @@ function ChatBox({ selectedUser, messages, currentUser, onSendMessage, onDeleteM
     }
   };
 
-  const handleCancelDelete = () => {
-    setShowDeleteDialog(false);
-    setMessageToDelete(null);
-  };
-
   const handleImageClick = (imageUrl) => {
     setImagePreview(imageUrl);
   };
 
   const groupMessagesByDate = () => {
     const groups = {};
-    messages.forEach(message => {
-      const dateKey = new Date(message.timestamp).toDateString();
-      if (!groups[dateKey]) {
-        groups[dateKey] = [];
-      }
-      groups[dateKey].push(message);
+    messages.forEach(msg => {
+      const key = new Date(msg.timestamp).toDateString();
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(msg);
     });
     return groups;
   };
 
-  const getProfileImage = (user) => {
-    if (user.profilePicture) {
-      return `https://chatwithlocalfriends.onrender.com${user.profilePicture}`;
-    }
-    return null;
-  };
+  const getProfileImage = (user) =>
+    user.profilePicture
+      ? `https://chatwithlocalfriends.onrender.com${user.profilePicture}`
+      : null;
 
   const messageGroups = groupMessagesByDate();
 
@@ -93,32 +88,35 @@ function ChatBox({ selectedUser, messages, currentUser, onSendMessage, onDeleteM
       {showDeleteDialog && (
         <DeleteConfirmDialog
           onConfirm={handleConfirmDelete}
-          onCancel={handleCancelDelete}
+          onCancel={() => setShowDeleteDialog(false)}
         />
       )}
 
       {imagePreview && (
         <div className="image-preview-overlay" onClick={() => setImagePreview(null)}>
           <div className="image-preview-container">
-            <button className="close-preview" onClick={() => setImagePreview(null)}>
-              ✕
-            </button>
+            <button className="close-preview">✕</button>
             <img src={imagePreview} alt="Preview" className="preview-image" />
           </div>
         </div>
       )}
 
+      {/* HEADER */}
       <div className="chat-box-header">
         <div className="chat-user-info">
           <div className="chat-user-avatar-wrapper">
             {getProfileImage(selectedUser) ? (
-              <img src={getProfileImage(selectedUser)} alt={selectedUser.name} className="chat-user-avatar-img" />
+              <img
+                src={getProfileImage(selectedUser)}
+                alt={selectedUser.name}
+                className="chat-user-avatar-img"
+              />
             ) : (
               <div className="chat-user-avatar">
                 {selectedUser.name.charAt(0).toUpperCase()}
               </div>
             )}
-            <span className={`chat-status-dot ${selectedUser.isOnline ? 'online' : 'offline'}`}></span>
+            <span className={`chat-status-dot ${selectedUser.isOnline ? 'online' : 'offline'}`} />
           </div>
           <div>
             <div className="chat-user-name">{selectedUser.name}</div>
@@ -127,13 +125,21 @@ function ChatBox({ selectedUser, messages, currentUser, onSendMessage, onDeleteM
             </div>
           </div>
         </div>
-        <button className="info-btn">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M10 2C5.59 2 2 5.59 2 10C2 14.41 5.59 18 10 18C14.41 18 18 14.41 18 10C18 5.59 14.41 2 10 2ZM10 14C9.45 14 9 13.55 9 13V9C9 8.45 9.45 8 10 8C10.55 8 11 8.45 11 9V13C11 13.55 10.55 14 10 14ZM11 6H9V4H11V6Z"/>
+
+        {/* 🔙 BACK → HOME */}
+        <button className="info-btn" onClick={onBack} title="Back">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M15 18l-6-6 6-6"
+            />
           </svg>
         </button>
       </div>
 
+      {/* MESSAGES */}
       <div className="messages-container">
         {Object.keys(messageGroups).length === 0 ? (
           <div className="no-messages">
@@ -145,46 +151,45 @@ function ChatBox({ selectedUser, messages, currentUser, onSendMessage, onDeleteM
               <div className="date-divider">
                 <span>{formatDate(new Date(dateKey))}</span>
               </div>
-              {messageGroups[dateKey].map((message, index) => {
-                const isOwnMessage = message.senderId === currentUser._id;
+
+              {messageGroups[dateKey].map((msg, i) => {
+                const isOwn = msg.senderId === currentUser._id;
                 return (
                   <div
-                    key={message._id || index}
-                    className={`message ${isOwnMessage ? 'own-message' : 'other-message'}`}
-                    onMouseEnter={() => setHoveredMessageId(message._id)}
+                    key={msg._id || i}
+                    className={`message ${isOwn ? 'own-message' : 'other-message'}`}
+                    onMouseEnter={() => setHoveredMessageId(msg._id)}
                     onMouseLeave={() => setHoveredMessageId(null)}
                   >
                     <div className="message-content">
-                      {!isOwnMessage && (
-                        <div className="message-sender">{message.senderName}</div>
-                      )}
-                      
-                      {message.messageType === 'image' && message.mediaUrl ? (
+                      {!isOwn && <div className="message-sender">{msg.senderName}</div>}
+
+                      {msg.messageType === 'image' && msg.mediaUrl && (
                         <div className="message-media">
-                          <img 
-                            src={`https://chatwithlocalfriends.onrender.com${message.mediaUrl}`} 
-                            alt="Sent media" 
+                          <img
+                            src={`https://chatwithlocalfriends.onrender.com${msg.mediaUrl}`}
+                            alt="media"
                             className="message-image"
-                            onClick={() => handleImageClick(`https://chatwithlocalfriends.onrender.com${message.mediaUrl}`)}
+                            onClick={() =>
+                              handleImageClick(
+                                `https://chatwithlocalfriends.onrender.com${msg.mediaUrl}`
+                              )
+                            }
                           />
                         </div>
-                      ) : null}
-                      
-                      {message.message && (
-                        <div className="message-text">{message.message}</div>
                       )}
-                      
+
+                      {msg.message && <div className="message-text">{msg.message}</div>}
+
                       <div className="message-footer">
-                        <div className="message-time">{formatTime(message.timestamp)}</div>
-                        {isOwnMessage && hoveredMessageId === message._id && (
-                          <button 
+                        <span className="message-time">{formatTime(msg.timestamp)}</span>
+
+                        {isOwn && hoveredMessageId === msg._id && (
+                          <button
                             className="delete-message-btn"
-                            onClick={() => handleDeleteClick(message._id)}
-                            title="Delete message"
+                            onClick={() => handleDeleteClick(msg._id)}
                           >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
+                            🗑
                           </button>
                         )}
                       </div>

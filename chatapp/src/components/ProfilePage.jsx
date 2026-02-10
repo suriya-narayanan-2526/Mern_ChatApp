@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebase";
 import '../styles/ProfilePage.css';
 
 function ProfilePage({ currentUser, onLogout, onProfileUpdate, onClose }) {
@@ -14,22 +16,33 @@ function ProfilePage({ currentUser, onLogout, onProfileUpdate, onClose }) {
 
     setUploading(true);
 
-    const formData = new FormData();
-    formData.append('profilePicture', file);
-
     try {
-      const response = await fetch(`https://chatwithlocalfriends.onrender.com/api/auth/profile/${currentUser._id}/upload`, {
-        method: 'POST',
-        body: formData,
+      // Create a unique filename
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const storageRef = ref(storage, `profiles/${file.name}-${uniqueSuffix}`);
+
+      // Upload file
+      const uploadTask = await uploadBytesResumable(storageRef, file);
+
+      // Get download URL
+      const downloadURL = await getDownloadURL(uploadTask.ref);
+
+      // Update backend with new URL
+      const response = await fetch(`https://chatwithlocalfriends.onrender.com/api/auth/profile/${currentUser._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ profilePicture: downloadURL }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        const updatedUser = { ...currentUser, profilePicture: data.profilePicture };
+        const updatedUser = { ...currentUser, profilePicture: data.user.profilePicture };
         onProfileUpdate(updatedUser);
       } else {
-        alert(data.message || 'Failed to upload profile picture');
+        alert(data.message || 'Failed to update profile picture');
       }
     } catch (err) {
       console.error('Upload error:', err);
@@ -85,7 +98,7 @@ function ProfilePage({ currentUser, onLogout, onProfileUpdate, onClose }) {
       <div className="profile-header">
         <button className="back-btn" onClick={onClose}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
         <h2>Profile</h2>
@@ -107,7 +120,7 @@ function ProfilePage({ currentUser, onLogout, onProfileUpdate, onClose }) {
                 <span className="loading-spinner"></span>
               ) : (
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M10 3C6.13 3 3 6.13 3 10C3 13.87 6.13 17 10 17C13.87 17 17 13.87 17 10C17 6.13 13.87 3 10 3ZM13 11H11V13H9V11H7V9H9V7H11V9H13V11Z"/>
+                  <path d="M10 3C6.13 3 3 6.13 3 10C3 13.87 6.13 17 10 17C13.87 17 17 13.87 17 10C17 6.13 13.87 3 10 3ZM13 11H11V13H9V11H7V9H9V7H11V9H13V11Z" />
                 </svg>
               )}
             </label>
@@ -175,7 +188,7 @@ function ProfilePage({ currentUser, onLogout, onProfileUpdate, onClose }) {
 
           <button onClick={onLogout} className="logout-btn">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M3 3H11V5H3V15H11V17H3C1.89 17 1 16.1 1 15V5C1 3.9 1.89 3 3 3ZM13.59 11H7V9H13.59L11.29 6.71L12.71 5.29L17.41 10L12.71 14.71L11.29 13.29L13.59 11Z"/>
+              <path d="M3 3H11V5H3V15H11V17H3C1.89 17 1 16.1 1 15V5C1 3.9 1.89 3 3 3ZM13.59 11H7V9H13.59L11.29 6.71L12.71 5.29L17.41 10L12.71 14.71L11.29 13.29L13.59 11Z" />
             </svg>
             Logout
           </button>

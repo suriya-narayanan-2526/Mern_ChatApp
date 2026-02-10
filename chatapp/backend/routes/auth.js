@@ -146,11 +146,12 @@ router.get('/profile/:userId', async (req, res) => {
 // Update user profile
 router.put('/profile/:userId', async (req, res) => {
   try {
-    const { name, bio } = req.body;
+    const { name, bio, profilePicture } = req.body;
     const updateData = {};
 
     if (name) updateData.name = name;
     if (bio !== undefined) updateData.bio = bio;
+    if (profilePicture) updateData.profilePicture = profilePicture;
 
     const user = await User.findByIdAndUpdate(
       req.params.userId,

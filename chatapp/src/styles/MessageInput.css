@@ -222,3 +222,181 @@
     grid-template-columns: repeat(6, 1fr);
   }
 }
+/* ========================= */
+/* Mobile View – Fix Message Input Full Width */
+/* ========================= */
+
+@media (max-width: 640px) {
+  /* Ensure input wrapper sticks correctly */
+  .message-input-wrapper {
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    z-index: 20;
+  }
+
+  /* Force container to use full width */
+  .message-input-container {
+    width: 100%;
+    padding: 12px 12px;
+    gap: 8px;
+    box-sizing: border-box;
+  }
+
+  /* Prevent flex shrinking issues */
+  .message-input-container > * {
+    flex-shrink: 0;
+  }
+
+  /* Input takes remaining space */
+  .message-input {
+    flex: 1 1 auto;
+    min-width: 0; /* 🔴 VERY IMPORTANT */
+    font-size: 14px;
+    padding: 12px 16px;
+  }
+
+  /* Buttons always visible */
+  .input-action-btn,
+  .send-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Emoji picker reposition for mobile */
+  .emoji-picker {
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 24px);
+    max-width: 360px;
+    bottom: 72px;
+  }
+}
+/* ========================= */
+/* Mobile View – Proper Full-Width Chat Layout */
+/* ========================= */
+
+@media (max-width: 640px) {
+  /* Chat box full screen */
+  .chat-box {
+    width: 100%;
+    height: 100dvh;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  /* Header edge-to-edge */
+  .chat-box-header {
+    padding: 14px 16px;
+  }
+
+  /* Messages container full width */
+  .messages-container {
+    padding: 12px 10px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Message wrapper uses full width */
+  .message {
+    width: 100%;
+  }
+
+  /* Message bubble width fix */
+  .message-content {
+    max-width: 85%;
+    word-break: break-word;
+  }
+
+  /* Own message alignment */
+  .own-message {
+    justify-content: flex-end;
+  }
+
+  /* Other message alignment */
+  .other-message {
+    justify-content: flex-start;
+  }
+
+  /* Remove extra spacing causing right gap */
+  .messages-container > * {
+    max-width: 100%;
+  }
+
+  /* Input wrapper fixed to bottom */
+  .message-input-wrapper {
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Input container edge-to-edge */
+  .message-input-container {
+    padding: 12px 12px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Prevent input overflow */
+  .message-input {
+    min-width: 0;
+  }
+}
+/* ================================================= */
+/* MOBILE – MESSAGE INPUT FULL WIDTH (FINAL FIX) */
+/* ================================================= */
+
+@media (max-width: 640px) {
+
+  /* Wrapper sticks to bottom and fills width */
+  .message-input-wrapper {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    background-color: #1a1a2e;
+    border-top: 1px solid rgba(139, 92, 246, 0.15);
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Container truly edge-to-edge */
+  .message-input-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    box-sizing: border-box;
+  }
+
+  /* Input grows correctly */
+  .message-input {
+    flex: 1;
+    min-width: 0;            /* 🔑 CRITICAL */
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  /* Buttons never shrink */
+  .input-action-btn,
+  .send-button {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+
+  /* Emoji picker centered on mobile */
+  .emoji-picker {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100vw - 24px);
+    max-width: 360px;
+    bottom: 72px;
+  }
+}
+
