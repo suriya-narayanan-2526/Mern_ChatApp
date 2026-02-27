@@ -45,7 +45,7 @@ function ProfilePage({ currentUser, onLogout, onProfileUpdate, onClose }) {
     setSaving(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/profile/${currentUser._id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/profile/${currentUser._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -103,23 +103,27 @@ function ProfilePage({ currentUser, onLogout, onProfileUpdate, onClose }) {
                 {currentUser.name.charAt(0).toUpperCase()}
               </div>
             )}
-            <label className="upload-btn" htmlFor="profile-upload">
-              {uploading ? (
-                <span className="loading-spinner"></span>
-              ) : (
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M10 3C6.13 3 3 6.13 3 10C3 13.87 6.13 17 10 17C13.87 17 17 13.87 17 10C17 6.13 13.87 3 10 3ZM13 11H11V13H9V11H7V9H9V7H11V9H13V11Z" />
-                </svg>
-              )}
-            </label>
-            <input
-              type="file"
-              id="profile-upload"
-              accept="image/*"
-              onChange={handleProfilePictureUpload}
-              style={{ display: 'none' }}
-              disabled={uploading}
-            />
+            {isEditing && (
+              <>
+                <label className="upload-btn" htmlFor="profile-upload">
+                  {uploading ? (
+                    <span className="loading-spinner"></span>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M10 3C6.13 3 3 6.13 3 10C3 13.87 6.13 17 10 17C13.87 17 17 13.87 17 10C17 6.13 13.87 3 10 3ZM13 11H11V13H9V11H7V9H9V7H11V9H13V11Z" />
+                    </svg>
+                  )}
+                </label>
+                <input
+                  type="file"
+                  id="profile-upload"
+                  accept="image/*"
+                  onChange={handleProfilePictureUpload}
+                  style={{ display: 'none' }}
+                  disabled={uploading}
+                />
+              </>
+            )}
           </div>
         </div>
 

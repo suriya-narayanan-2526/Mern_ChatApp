@@ -7,19 +7,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadDir = 'uploads/profiles';
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'profile-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage: storage,
@@ -180,7 +168,7 @@ router.post('/profile/:userId/upload', upload.single('profilePicture'), async (r
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const profilePictureUrl = `/uploads/profiles/${req.file.filename}`;
+    const profilePictureUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
 
     const user = await User.findByIdAndUpdate(
       req.params.userId,

@@ -35,16 +35,21 @@ function ProfileModal({ user, onClose, onUpdate }) {
     setLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('name', name);
-      formData.append('bio', bio);
-      if (profilePhoto) {
-        formData.append('profilePhoto', profilePhoto);
+      const payload = {
+        name,
+        bio
+      };
+
+      if (previewUrl && previewUrl.startsWith('data:')) {
+        payload.profilePicture = previewUrl;
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/profile/${user._id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/profile/${user._id}`, {
         method: 'PUT',
-        body: formData
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
       });
 
       const data = await response.json();
