@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { storage } from "../firebase";
 import '../styles/ProfilePage.css';
+import { API_BASE_URL } from '../config';
 
 function ProfilePage({ currentUser, onLogout, onProfileUpdate, onClose }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -17,32 +16,22 @@ function ProfilePage({ currentUser, onLogout, onProfileUpdate, onClose }) {
     setUploading(true);
 
     try {
-      // Create a unique filename
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      const storageRef = ref(storage, `profiles/${file.name}-${uniqueSuffix}`);
-
-      // Upload file
-      const uploadTask = await uploadBytesResumable(storageRef, file);
-
-      // Get download URL
-      const downloadURL = await getDownloadURL(uploadTask.ref);
+      const formData = new FormData();
+      formData.append('profilePicture', file);
 
       // Update backend with new URL
-      const response = await fetch(`https://chatwithlocalfriends.onrender.com/api/auth/profile/${currentUser._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ profilePicture: downloadURL }),
+      const response = await fetch(`${API_BASE_URL}/api/auth/profile/${currentUser._id}/upload`, {
+        method: 'POST',
+        body: formData,
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        const updatedUser = { ...currentUser, profilePicture: data.user.profilePicture };
+        const updatedUser = { ...currentUser, profilePicture: data.profilePictureUrl };
         onProfileUpdate(updatedUser);
       } else {
-        alert(data.message || 'Failed to update profile picture');
+        alert(data.message || 'Failed to upload profile picture');
       }
     } catch (err) {
       console.error('Upload error:', err);
@@ -56,7 +45,7 @@ function ProfilePage({ currentUser, onLogout, onProfileUpdate, onClose }) {
     setSaving(true);
 
     try {
-      const response = await fetch(`https://chatwithlocalfriends.onrender.com/${currentUser._id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/profile/${currentUser._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -87,10 +76,9 @@ function ProfilePage({ currentUser, onLogout, onProfileUpdate, onClose }) {
   };
 
   const getProfileImage = () => {
-    if (currentUser.profilePicture) {
-      return `https://chatwithlocalfriends.onrender.com${currentUser.profilePicture}`;
-    }
-    return null;
+    if (!currentUser.profilePicture) return null;
+    if (currentUser.profilePicture.startsWith('http')) return currentUser.profilePicture;
+    return `${API_BASE_URL}${currentUser.profilePicture}`;
   };
 
   return (

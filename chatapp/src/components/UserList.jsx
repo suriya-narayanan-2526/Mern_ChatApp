@@ -1,7 +1,8 @@
 import React from 'react';
 import '../styles/UserList.css';
+import { API_BASE_URL } from '../config';
 
-function UserList({ users, selectedUser, onUserSelect, unreadMessages }) {
+function UserList({ users, currentUser, onSelectUser, selectedUser, isMobile, showSidebar }) {
   const onlineUsers = users.filter(user => user.isOnline);
   const offlineUsers = users.filter(user => !user.isOnline);
 
@@ -17,20 +18,21 @@ function UserList({ users, selectedUser, onUserSelect, unreadMessages }) {
   };
 
   const getProfileImage = (user) => {
-    if (user.profilePicture) {
-      return `https://chatwithlocalfriends.onrender.com${user.profilePicture}`;
-    }
-    return null;
+    if (!user.profilePicture) return null;
+    if (user.profilePicture.startsWith('http')) return user.profilePicture;
+    return `${API_BASE_URL}${user.profilePicture}`;
   };
 
   const renderUser = (user) => {
-    const unreadCount = unreadMessages[user._id] || 0;
-    
+    // unreadMessages prop was removed, so unreadCount logic needs to be removed or adapted
+    // For now, removing the unreadCount logic as it depends on the removed prop.
+    // const unreadCount = unreadMessages[user._id] || 0;
+
     return (
       <div
         key={user._id}
         className={`user-item ${selectedUser?._id === user._id ? 'active' : ''}`}
-        onClick={() => onUserSelect(user)}
+        onClick={() => onSelectUser(user)}
       >
         <div className="user-avatar-wrapper">
           {getProfileImage(user) ? (
@@ -45,9 +47,6 @@ function UserList({ users, selectedUser, onUserSelect, unreadMessages }) {
         <div className="user-info">
           <div className="user-name-row">
             <span className="user-name">{user.name}</span>
-            {unreadCount > 0 && (
-              <span className="unread-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
-            )}
           </div>
           <span className="user-status">
             {user.isOnline ? 'Online' : `${formatLastSeen(user.lastSeen)}`}

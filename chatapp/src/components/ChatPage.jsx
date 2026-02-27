@@ -4,8 +4,9 @@ import UserList from './UserList';
 import ChatBox from './ChatBox';
 import ProfilePage from './ProfilePage';
 import '../styles/ChatPage.css';
+import { API_BASE_URL } from '../config';
 
-const socket = io('https://chatwithlocalfriends.onrender.com', {
+const socket = io(API_BASE_URL, {
   transports: ['websocket'],
   reconnection: true,
   reconnectionDelay: 1000,
@@ -55,9 +56,7 @@ function ChatPage({ currentUser, onLogout }) {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(
-          'https://chatwithlocalfriends.onrender.com/api/auth/users'
-        );
+        const response = await fetch(`${API_BASE_URL}/api/auth/users`);
         const data = await response.json();
         setUsers(data.filter(user => user._id !== currentUser._id));
       } catch (err) {

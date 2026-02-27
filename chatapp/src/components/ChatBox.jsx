@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import MessageInput from './MessageInput';
 import DeleteConfirmDialog from './DeleteConfirmDialog';
 import '../styles/ChatBox.css';
+import { API_BASE_URL } from '../config';
 
 function ChatBox({
   selectedUser,
@@ -78,7 +79,7 @@ function ChatBox({
 
   const getProfileImage = (user) =>
     user.profilePicture
-      ? `https://chatwithlocalfriends.onrender.com${user.profilePicture}`
+      ? (user.profilePicture.startsWith('http') ? user.profilePicture : `${API_BASE_URL}${user.profilePicture}`)
       : null;
 
   const messageGroups = groupMessagesByDate();
@@ -167,12 +168,12 @@ function ChatBox({
                       {msg.messageType === 'image' && msg.mediaUrl && (
                         <div className="message-media">
                           <img
-                            src={`https://chatwithlocalfriends.onrender.com${msg.mediaUrl}`}
+                            src={msg.mediaUrl.startsWith('http') ? msg.mediaUrl : `${API_BASE_URL}${msg.mediaUrl}`}
                             alt="media"
                             className="message-image"
                             onClick={() =>
                               handleImageClick(
-                                `https://chatwithlocalfriends.onrender.com${msg.mediaUrl}`
+                                msg.mediaUrl.startsWith('http') ? msg.mediaUrl : `${API_BASE_URL}${msg.mediaUrl}`
                               )
                             }
                           />

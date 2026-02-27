@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/LoginPage.css';
+import { API_BASE_URL } from '../config';
 
 function LoginPage({ onLogin }) {
   const [name, setName] = useState('');
@@ -26,7 +27,7 @@ function LoginPage({ onLogin }) {
     setLoading(true);
 
     try {
-      const response = await fetch('https://chatwithlocalfriends.onrender.com/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -55,10 +56,10 @@ function LoginPage({ onLogin }) {
         <div className="login-icon-wrapper">
           <div className="login-icon">💬</div>
         </div>
-        
+
         <h1 className="login-title">Welcome to ChatApp</h1>
         <p className="login-subtitle">Enter your details to get started</p>
-        
+
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
             <label htmlFor="name" className={focusedField === 'name' ? 'focused' : ''}>
@@ -101,8 +102,8 @@ function LoginPage({ onLogin }) {
             </div>
           )}
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className={`login-button ${loading ? 'loading' : ''}`}
             disabled={loading}
           >

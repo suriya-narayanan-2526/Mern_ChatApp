@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { storage } from "../firebase";
 import '../styles/MessageInput.css';
+import { API_BASE_URL } from '../config';
 
 function MessageInput({ onSendMessage }) {
   const [message, setMessage] = useState('');
@@ -51,22 +50,25 @@ function MessageInput({ onSendMessage }) {
     setUploading(true);
 
     try {
-      // Create a unique filename
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      const storageRef = ref(storage, `media/${file.name}-${uniqueSuffix}`);
+      const formData = new FormData();
+      formData.append('media', file);
 
-      // Upload file
-      const uploadTask = await uploadBytesResumable(storageRef, file);
+      const response = await fetch(`${API_BASE_URL}/api/media/upload`, {
+        method: 'POST',
+        body: formData,
+      });
 
-      // Get download URL
-      const downloadURL = await getDownloadURL(uploadTask.ref);
+      const data = await response.json();
 
-      // Send message with image URL
-      onSendMessage('', 'image', downloadURL);
-
+      if (response.ok) {
+        // Send message with image URL from backend
+        onSendMessage('', 'image', data.mediaUrl);
+      } else {
+        alert(data.message || 'Failed to upload media');
+      }
     } catch (err) {
       console.error('Upload error:', err);
-      alert('Failed to upload media');
+      alert('Failed to connect to server for media upload');
     } finally {
       setUploading(false);
       if (fileInputRef.current) {

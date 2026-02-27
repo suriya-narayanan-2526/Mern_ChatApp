@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import '../styles/ProfileModal.css';
+import { API_BASE_URL } from '../config';
 
 function ProfileModal({ user, onClose, onUpdate }) {
   const [name, setName] = useState(user.name || '');
@@ -41,7 +42,7 @@ function ProfileModal({ user, onClose, onUpdate }) {
         formData.append('profilePhoto', profilePhoto);
       }
 
-      const response = await fetch(`https://chatwithlocalfriends.onrender.com/api/profile/${user._id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/profile/${user._id}`, {
         method: 'PUT',
         body: formData
       });
@@ -66,14 +67,14 @@ function ProfileModal({ user, onClose, onUpdate }) {
     <div className="modal-overlay-dark" onClick={onClose}>
       <div className="modal-content-dark" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close-btn" onClick={onClose}>✕</button>
-        
+
         <h2 className="modal-title">Profile details</h2>
 
         <form onSubmit={handleSubmit} className="profile-form">
           <div className="profile-photo-section">
             <div className="photo-preview">
               {previewUrl ? (
-                <img src={previewUrl.startsWith('http') ? previewUrl : `https://chatwithlocalfriends.onrender.com${previewUrl}`} alt="Profile" />
+                <img src={previewUrl.startsWith('http') ? previewUrl : previewUrl.startsWith('data:') ? previewUrl : `${API_BASE_URL}${previewUrl}`} alt="Profile" />
               ) : (
                 <div className="default-avatar">
                   {name.charAt(0).toUpperCase()}

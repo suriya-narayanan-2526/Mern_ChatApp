@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/AuthPage.css';
+import { API_BASE_URL } from '../config';
 
 function AuthPage({ onAuthSuccess, isLogin, onToggleMode }) {
   const [name, setName] = useState('');
@@ -37,11 +38,11 @@ function AuthPage({ onAuthSuccess, isLogin, onToggleMode }) {
 
     try {
       const endpoint = isLogin ? 'login' : 'signup';
-      const body = isLogin 
+      const body = isLogin
         ? { email, password }
         : { name, email, password };
 
-      const response = await fetch(`https://chatwithlocalfriends.onrender.com/api/auth/${endpoint}`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +71,7 @@ function AuthPage({ onAuthSuccess, isLogin, onToggleMode }) {
         <div className="auth-header">
           <div className="app-logo">
             <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-              <path d="M24 4C13.5 4 5 12.5 5 23C5 28.5 7.5 33.5 11.5 37L8 44L15.5 41C18.5 42.5 21.5 43 24 43C34.5 43 43 34.5 43 23C43 12.5 34.5 4 24 4Z" fill="#8B5CF6"/>
+              <path d="M24 4C13.5 4 5 12.5 5 23C5 28.5 7.5 33.5 11.5 37L8 44L15.5 41C18.5 42.5 21.5 43 24 43C34.5 43 43 34.5 43 23C43 12.5 34.5 4 24 4Z" fill="#8B5CF6" />
             </svg>
           </div>
           <h1 className="auth-title">{isLogin ? 'Welcome Back' : 'Create Account'}</h1>
@@ -78,7 +79,7 @@ function AuthPage({ onAuthSuccess, isLogin, onToggleMode }) {
             {isLogin ? 'Sign in to continue to QuickChat' : 'Sign up to get started with QuickChat'}
           </p>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="auth-form">
           {!isLogin && (
             <div className="form-group">
