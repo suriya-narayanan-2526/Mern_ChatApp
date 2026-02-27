@@ -2,7 +2,7 @@ import React from 'react';
 import '../styles/UserList.css';
 import { API_BASE_URL } from '../config';
 
-function UserList({ users, currentUser, onSelectUser, selectedUser, isMobile, showSidebar }) {
+function UserList({ users, selectedUser, onUserSelect, unreadMessages }) {
   const onlineUsers = users.filter(user => user.isOnline);
   const offlineUsers = users.filter(user => !user.isOnline);
 
@@ -24,15 +24,13 @@ function UserList({ users, currentUser, onSelectUser, selectedUser, isMobile, sh
   };
 
   const renderUser = (user) => {
-    // unreadMessages prop was removed, so unreadCount logic needs to be removed or adapted
-    // For now, removing the unreadCount logic as it depends on the removed prop.
-    // const unreadCount = unreadMessages[user._id] || 0;
+    const unreadCount = unreadMessages ? (unreadMessages[user._id] || 0) : 0;
 
     return (
       <div
         key={user._id}
         className={`user-item ${selectedUser?._id === user._id ? 'active' : ''}`}
-        onClick={() => onSelectUser(user)}
+        onClick={() => onUserSelect(user)}
       >
         <div className="user-avatar-wrapper">
           {getProfileImage(user) ? (
@@ -47,6 +45,9 @@ function UserList({ users, currentUser, onSelectUser, selectedUser, isMobile, sh
         <div className="user-info">
           <div className="user-name-row">
             <span className="user-name">{user.name}</span>
+            {unreadCount > 0 && (
+              <span className="unread-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
+            )}
           </div>
           <span className="user-status">
             {user.isOnline ? 'Online' : `${formatLastSeen(user.lastSeen)}`}
