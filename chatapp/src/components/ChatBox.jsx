@@ -201,7 +201,7 @@ function ChatBox({
             </div>
           ))
         )}
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef} style={{ float: "left", clear: "both", height: "1px" }} />
       </div>
 
       <MessageInput onSendMessage={onSendMessage} />
